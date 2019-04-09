@@ -1,0 +1,23 @@
+{
+  "manifest_version": 2,
+  "name": "Songkarnizer",
+  "version": "0.0.2",
+  "description": "songkran simulator",
+  "icons": {
+    "16": "images/16.png",
+    "128": "images/128.png"
+  },
+  "author": "Karnpapon Boonput <karnpapon@gmail.com>",
+  "background": {
+    "persistent": false,
+    "scripts": ["index.js"]
+  },
+  "permissions": ["activeTab", "storage", "tabCapture"],
+  "browser_action": {
+    "default_icon": {
+      "19": "images/19.png",
+      "38": "images/38.png"
+    },
+    "default_title": "Songkarnizer"
+  }
+}
