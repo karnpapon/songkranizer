@@ -3247,19 +3247,12 @@ var _vedajs2 = _interopRequireDefault(_vedajs);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// import Store from './store';
-
 const ID = '____SONGKRANIZER____';
 
 if (!window._____veda) {
   window._____veda = new _vedajs2.default({});
 }
 const veda = window._____veda;
-
-// if (!window._____store) {
-//   window._____store = new Store();
-// }
-// const store = window._____store;
 
 const resize = () => {
   veda.resize(window.innerWidth, window.innerHeight);

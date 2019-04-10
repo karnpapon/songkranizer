@@ -1,5 +1,4 @@
 import Veda from 'vedajs';
-// import Store from './store';
 
 const ID = '____SONGKRANIZER____';
 
@@ -7,11 +6,6 @@ if (!window._____veda) {
   window._____veda = new Veda({});
 }
 const veda = window._____veda;
-
-// if (!window._____store) {
-//   window._____store = new Store();
-// }
-// const store = window._____store;
 
 const resize = () => {
   veda.resize(window.innerWidth, window.innerHeight);
