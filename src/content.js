@@ -1,6 +1,5 @@
-/* @flow */
 import Veda from 'vedajs';
-import Store from './store';
+// import Store from './store';
 
 const ID = '____SONGKRANIZER____';
 
@@ -9,18 +8,17 @@ if (!window._____veda) {
 }
 const veda = window._____veda;
 
-if (!window._____store) {
-  window._____store = new Store();
-}
-const store = window._____store;
+// if (!window._____store) {
+//   window._____store = new Store();
+// }
+// const store = window._____store;
 
 const resize = () => {
   veda.resize(window.innerWidth, window.innerHeight);
 }
 
 window.chrome.runtime.onMessage.addListener(msg => {
-
-  // visual part.
+ 
   const body = document.body;
   if (!body) { return; }
 
@@ -31,6 +29,7 @@ window.chrome.runtime.onMessage.addListener(msg => {
       veda.loadTexture('image', msg.imageUrl);
       veda.play();
     } else {
+
       canvas = document.createElement('canvas');
       canvas.id = ID;
       canvas.style.position = 'fixed';
@@ -43,7 +42,6 @@ window.chrome.runtime.onMessage.addListener(msg => {
       canvas.style.pointerEvents = 'none';
       canvas.style.margin = '0';
       canvas.style.padding = '0';
-      // canvas.style.opacity = '0.5';
       canvas.style.mixBlendMode = msg.shader.blend;
 
       body.appendChild(canvas);
@@ -55,12 +53,5 @@ window.chrome.runtime.onMessage.addListener(msg => {
       veda.loadFragmentShader(msg.shader.code);
       veda.play();
     }
-  } else if (msg.type === 'songkranizer:unload') {
-    window.removeEventListener('resize', resize);
-    veda.stop();
-    const canvas = document.getElementById(ID);
-    if (canvas) {
-      body.removeChild(canvas);
-    }
-  }
+  } 
 });

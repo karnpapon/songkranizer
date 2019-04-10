@@ -4,6 +4,7 @@ module.exports = {
   entry: {
     index: path.resolve(__dirname, 'src/index.js'),
     content: path.resolve(__dirname, 'src/content.js'),
+    audiocontent: path.resolve(__dirname, 'src/audiocontent.js'),
   },
   output: {
     filename: '[name].js',

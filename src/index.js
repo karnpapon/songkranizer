@@ -1,37 +1,10 @@
 import Store from './store'
+import AudioStore from './audiostore';
+
 const store = new Store();
+const audio = new AudioStore()
+const { context,filt,panner,delay,feedback } = audio
 
-var context = new AudioContext()
-
-const createFilterNode = (context, frequency, ql, gainValue) => {
-  var filter = context.createBiquadFilter(); 
-
-  filter.type = 'lowpass'; 
-  filter.frequency.value = frequency; 
-  filter.gain.value = gainValue; 
-  filter.Q.value = ql; 
-
-  return filter;
-}
-
-const createPannerNode = ( context, pan) => {
-  var pannerNode = context.createStereoPanner();
-  pannerNode.pan.value = pan;
-
-  return pannerNode
-}
-
-const createDelayNode = ( context, time) => {
-  var delayNode = context.createDelay();
-  delayNode.delayTime.value = time
-  return delayNode
-}
-
-const createGainNode = ( context, val) => {
-  var gainNode = context.createGain();
-  gainNode.gain.value = val;
-  return gainNode
-}
 
 const capture = (tab) => {
   chrome.tabs.captureVisibleTab(null, { format: 'png' }, imageUrl => {
@@ -39,7 +12,6 @@ const capture = (tab) => {
       type: 'songkranizer:load',
       imageUrl: imageUrl,
       shader: store.getActiveShader(),
-      action: 'eq-init',
     }
     chrome.tabs.sendMessage(tab.id, option);
   });
@@ -50,19 +22,34 @@ const constraints = {
   video : false 
 }
 
-var filt = createFilterNode(context, 333.25, 13.5,12)
-var panner = createPannerNode(context, -0.43)
-var delay = createDelayNode(context, 0.125)
-var feedback = createGainNode(context, 0.35)
-
-chrome.browserAction.onClicked.addListener(tab => {
+chrome.browserAction.onClicked.addListener(activeTab => {
   chrome.tabCapture.capture(constraints, (stream)  => {
+    if (!stream) {
+      console.error('Couldn\'t obtain stream.', context);
+      context.close()
+      return
+    }
     var source = context.createMediaStreamSource(stream);
     source.connect(filt)
     .connect(panner) 
     .connect(delay).connect(feedback).connect(delay)
     .connect(context.destination); 
+
+    // stream.stop();
   });
-  // capture(tab);
-  // chrome.tabs.executeScript(tab.id, {file: 'content.js'});
+
+
+  // chrome.tabs.query({audible:true},(tab) => {
+  //     var option = {
+  //       type: 'audio enabled!',
+  //       tabCapture: window.chrome.tabCapture
+  //     }
+  //   chrome.tabs.sendMessage(tab[0].id, option);
+  //   chrome.tabs.executeScript(tab[0].id,{ file: 'audiocontent.js'});
+  // })
+  
+  capture(activeTab);
+  chrome.tabs.executeScript(activeTab.id, {file: 'content.js'});
 });
+
+
