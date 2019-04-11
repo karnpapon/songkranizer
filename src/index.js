@@ -3,8 +3,11 @@ import AudioStore from './audiostore';
 
 const store = new Store();
 const audio = new AudioStore()
-const { context,filt,panner,delay,feedback } = audio
 
+const constraints = {
+  audio : true,
+  video : false 
+}
 
 const capture = (tab) => {
   chrome.tabs.captureVisibleTab(null, { format: 'png' }, imageUrl => {
@@ -17,57 +20,38 @@ const capture = (tab) => {
   });
 }
 
-const constraints = {
-  audio : true,
-  video : false 
-}
+const captureCurrentTab = (tab) => {
+  if( tab.length > 0 ){
+    var context = new AudioContext()
+    var filt = audio.createFilterNode(context, 333.25, 13.5,12)
+    var panner = audio.createPannerNode(context, -0.43)
+    var delay = audio.createDelayNode(context, 0.125)
+    var feedback = audio.createGainNode(context, 0.35)
 
-const captureCurrentTab = () => {
-  console.log('reqeusted current tab');
-  chrome.tabs.query({active : true}, function(tab) {
-      console.log('got current tab');
-
-      chrome.tabCapture.capture({
-          audio : true,
-          video : false
-      }, handleCapture);
-  });
+    chrome.tabCapture.capture(constraints, (stream)  => {
+      if (!stream) {
+        console.error('Couldn\'t obtain stream.');
+        return
+      }
+      var source = context.createMediaStreamSource(stream);
+      source.connect(filt)
+      .connect(panner) 
+      .connect(delay).connect(feedback).connect(delay)
+      .connect(context.destination); 
+    });
+  } else {
+    if( context ){
+      context.close()
+    }
+  }
 }    
 
 chrome.browserAction.onClicked.addListener(activeTab => {
 
+  // handle visual.
   capture(activeTab);
-  chrome.tabs.executeScript(activeTab.id, {file: 'content.js'});
+  chrome.tabs.executeScript(activeTab.id, {file: 'content.js'});  
 
-
-  chrome.tabCapture.capture(constraints, (stream)  => {
-    if (!stream) {
-      console.error('Couldn\'t obtain stream.', context);
-      return
-    }
-
-    var source = context.createMediaStreamSource(stream);
-    source.connect(filt)
-    .connect(panner) 
-    .connect(delay).connect(feedback).connect(delay)
-    .connect(context.destination); 
-  });
-
-
-  // chrome.tabs.query({audible:true},(tab) => {
-
-  //   console.log("tab", tab)
-  //   if(tab.length > 0){
-  //     chrome.tabCapture.getMediaStreamId({ targetTabId:tab[0].id }, (streamId) => {
-  //       console.log("streamId", streamId)
-  //     })
-  //   }
-    //     var option = {
-    //       type: 'audio enabled!',
-    //       tabCapture: window.chrome.tabCapture
-    //     }
-    //   chrome.tabs.sendMessage(tab[0].id, option);
-    //   chrome.tabs.executeScript(tab[0].id,{ file: 'audiocontent.js'});
-  // })
-  
+  // handle sound processing.
+  chrome.tabs.query({audible:true, active: true},captureCurrentTab) 
 });
