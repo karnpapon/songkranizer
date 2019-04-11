@@ -2,6 +2,8 @@
 
 [Songkran Festival](https://en.wikipedia.org/wiki/Songkran_(Thailand)), simulator in Chrome extension.
 
+![Alt text](./img/ss.png?raw=true "Title")
+
 ```bash
 # Go into the repository
 cd songkranizer
